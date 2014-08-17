@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<script type='text/javascript' src='scripts/RubixCube.js'> </script>
+<script type='text/javascript'>
+/* 
+ *	Rubix Cube Interface
+ *	    Howard Xu
+ *	Copyright Aug. 8, 2012
+ */
+
+// interface functions 
+function msg(s)
+{
+   var el = document.getElementById('msg');
+   el.innerHTML = s;
+}
+//  redisplay
+function redisp()
+{
+    var el = document.getElementById('cube');
+    var s = '<svg xmlns="http://www.w3.org/2000/svg" version="1.1" height="600" width="820">';
+    s += a.getCube(1);
+    s += a.getCube(0, 450, 200);
+    s += '</svg>';
+    el.innerHTML = s; 
+//    msg( a.getInside());
+}
+// cahnge
+function change(k) {
+    var d = 0;
+    var n=-1;
+    var c = 1;
+    if ( k > 90 ) {
+	  c = 0;
+	  k -= 32;
+    }
+    switch (k) {
+	// TOP
+	case 81:	// Q
+	    n = 0;	
+	break;
+	case 87:	// W
+	    n = 1;
+	break;
+	case 69:	// E
+	    n = 2;
+	break;
+	case 82:	// R
+	    n = 3;
+	break;
+	case 84:	// T
+	    n = 4; 
+	break;
+	case 89:	// Y
+	    n = 5;
+	break;
+	// RIGHT
+	case 65:	// A
+	    n = 0;	d = 2;
+	break;
+	case 83:	// S
+	    n = 1;	d = 2;
+	break;
+	case 68:	// D
+	    n = 2;	d = 2;
+	break;
+	case 70:	// F
+	    n = 3;	d = 2;
+	break;
+	case 71:	// G
+	    n = 4;  d = 2;
+	break;
+	case 72:	// H
+	    n = 5;	d = 2;
+	break;
+	// FRONT
+	case 90:	// Z
+	    n = 0;	d = 1;
+	break;
+	case 88:	// X
+	    n = 1;	d = 1;
+	break;
+	case 67:	// C
+	    n = 2;	d = 1;
+	break;
+	case 86:	// V
+	    n = 3;	d = 1;
+	break;
+	case 66:	// B
+	    n = 4;  d = 1;
+	break;
+	case 78:	// N
+	    n = 5;  d = 1;
+	break;
+	default:
+	break;
+    }
+    if (n != -1) {
+         a.rotate( d, n%a.N, c);
+    	   redisp();
+    }
+}
+// animation
+function genRotate()
+{
+    var d = Math.floor(Math.random()*3);
+    var n = Math.floor(Math.random()*a.N);
+    var c = Math.floor(Math.random()*2);
+    a.rotate(d, n, c);
+    redisp();
+    if (st == 0) clearInterval(rid);
+}
+// key process
+function process_spk(event) {
+    if (window.event)
+        process_key(event);
+    return false;
+}
+function process_key(event) {
+   if ( st ) { st=0; return; }
+   if ( a.setUndo() ) return;
+   if (window.event)
+       event = window.event;
+//   msg(event.keyCode + "  " + event.which);
+   if (event.keyCode == 0)
+   	 change( event.which);
+   else {
+	 st = 1;
+	 rid = setInterval("genRotate()", 1000);
+   }
+}
+// resolve
+function resolve() {
+   if ( st ) { st=0; return; }
+   a.setUndo(redisp);
+}
+// reset
+function reset(o)
+{
+    st = 0;
+    switch(o.selectedIndex) {
+	  case 0:  a = new RubixCube(2,40);
+	  break;
+	  case 1:  a = new RubixCube(3,30);
+	  break;
+	  case 2:  a = new RubixCube(4,25);
+	  break;
+	  case 3:  a = new RubixCube(5,22);
+	  break;
+	  case 4:  a = new RubixCube(6,20);
+	  break;
+    }
+    redisp();
+}
+// mouse process
+function process_mouse(event) {
+//msg(a.getInside());
+   if ( st ) { st=0; return; }
+   if ( a.setUndo() ) return;
+   var docX= event.pageX;
+   var docY= event.pageY;
+   if (window.event) {
+       event = window.event;
+       // IE case
+       var d= (document.documentElement && 
+              document.documentElement.scrollLeft != null) ?
+              document.documentElement : document.body;
+       docX= event.clientX + d.scrollLeft;
+       docY= event.clientY + d.scrollTop;
+   } 
+   var m = a.checkXY( docX, docY, 450, 200 );
+   if ( m != -1 ) {
+         if ( a.getRotate(m) != -1)
+		 redisp();
+   }
+   else {
+	  m = a.checkXY(docX, docY ) ;
+   	  if ( m != -1 ) {
+         	if ( a.getRotate(m) != -1)
+		    redisp();
+	  }
+// msg ("X: " + docX + "  Y: " + docY + " N: " + m);
+   }
+}
+
+// Object instance
+var a = new RubixCube(3,30);
+var st = 0;				// status
+</script>
+
+<html>
+<body>
+<div style="position:absolute;left:850px;top:20px; width:200px;">Welcome to RubixCube    
+<b>Instruction:</b><br/> Control rotate keys: <br/>1. QWERTY line for TOP <br>2. ASDFGH line for RIGHT<br>3. ZXCVBN line for FRONT <br/>4. with Shift key [clockwise] <br>
+ 5. Arrow keys to generate random rotations, next event will stop it.<br><br>
+ Using mouse to click the cube to rotate, figure out the rotating rules on each surface of cube. <br>Have a fun!</div>
+<div id='msg' style="position:absolute;left:850px;top:380px;"></div>
+<div id='cube' onmousedown="process_mouse(event);" >
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" height="600" width='820'>
+<script type='text/javascript'>
+	document.write(a.getCube(1));
+	document.write(a.getCube(0,450, 200));
+  	document.onkeypress=process_key;
+   	document.onkeydown=process_spk;
+</script>
+<text fill="#ffffff" font-size="45" font-family="Verdana" x="250" y="86">SVG</text>
+   Sorry, your browser does not support inline SVG.
+</svg>
+</div>
+<div style="position:absolute;left:850px;top:340px;">
+Option: <select onchange='reset(this)'><option>2x2x2</option><option selected="selected">3x3x3</option>
+<option>4x4x4</option><option>5x5x5</option><option>6x6x6</option></select>
+&nbsp;&nbsp;&nbsp;&nbsp;
+<input type='button' value='Resolve' onclick='resolve()'></input>
+</div>
+</body>
+</html>

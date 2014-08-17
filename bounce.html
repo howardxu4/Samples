@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Bounce</title>
+	<script>
+	/*
+	 *        Bounce Back Game
+	 *          Howard Xu
+	 *        Aug. 10, 2014
+	 */
+	function pp(cvs, c, m) {
+		cvs = document.getElementById(cvs);
+		var ctx = cvs.getContext("2d");
+		var W = cvs.offsetWidth, H = cvs.offsetHeight, R=4, B=15, V=40;
+		var HPI = Math.PI/2, XN = 10, YN = 4, YH = 20;
+		var x, y, d, p, t, l, f, n, a, px, py, u, g;
+		cvs.addEventListener("mousedown", msdn, false);
+		cvs.addEventListener("mouseup", function(){f=false}, false);
+		cvs.addEventListener("mousemove", clbk, false);
+		addEventListener("keydown", kydn, false);
+        	c = document.getElementById(c);     // checkbox
+        	m = document.getElementById(m);     // snap
+		function kydn(e) {
+			e = e || event;
+			switch(e.keyCode) {
+				case 37: movepaddle(-4*R);	// left
+				break;
+				case 38: u--;			// up
+				break;
+				case 39: movepaddle(4*R);	// right
+				break;
+				case 40: u++;			// down
+				break;
+			}
+		}
+		function msdn(e) {
+			e = e || event;
+			f = true;
+			px = e.clientX;
+			py = e.clientY;
+		}
+		function clbk(e) {
+			if (f) {
+				e = e || event;
+				if (e.clientX != px)
+					movepaddle((e.clientX - px));
+				px = e.clientX;
+				u =  e.clientY - py;
+				py = e.clientY;
+			}
+		}
+		function mesg(s) {
+			if(s !== undefined)
+				setTimeout(function(){
+					ctx.font = "20px Arial";
+					ctx.fillStyle = "#0000FF";
+					ctx.fillText(s, W/10, H/2);}, 200);
+		}
+		function target() {
+			ctx.strokeStyle="#0F0F0F";
+			var k = true
+			for (var i=0; i<n; i++) {
+				if (a[i] != 0) {
+					ctx.beginPath();
+					ctx.arc(a[i], 10 + Math.floor(i/XN)*YH,R,0,2*Math.PI);
+					ctx.stroke();
+					k = false;
+				}
+			}
+			ctx.strokeStyle="#FF0000";
+			if (k) 
+				stop('Congratulation, you win!');
+		}
+		function show() {;
+			ctx.fillStyle = "#F1E1D9";
+			ctx.fillRect(0,0,W,H);
+			target();
+			ctx.beginPath();
+			ctx.arc(x,y,R,0,2*Math.PI);
+			ctx.stroke();
+			ctx.fillStyle = "#00FF00";
+			ctx.fillRect(p,H-B,V,8);
+		}
+		function chkball(x,y) {
+			var w = 10+R;
+			for(var i=0; i<XN; i++) {
+				if (Math.abs(w-x) < 2*R) {
+					for(var j=YN-1; j>=0; j--) 
+						if (a[j*XN + i] && Math.abs(j*YH+10-y) < 2*R) {
+                            a[j*XN + i] = 0;
+                            return d+=g;
+                        }
+				}
+				w+=W/XN;
+			}
+		}
+		function setball() {
+			if (x < R) { d=Math.PI-d; x+=R;}
+			if (x > W-R){ d=Math.PI-d; x-=R;}
+			if (y < YN*YH) {
+				chkball(x,y);
+				if (y < R ) { d=-d; y+=R;}
+			}
+			if (y > H-B && x >= p && x <= p+V) {
+				d=-d; y-=R;
+				d+=(V/2 +p -x)/60;		// adjust degree
+				if (u < 0) y+=u; 		// adjust position
+				if (l > 10) {			// adjust speed
+					stop();
+					t = setInterval(bounce, --l);
+				}
+			}
+			if (y > H-R) {
+				stop('Sorry, you lost the game!');
+			}
+			x += R*Math.cos(d);
+			y += R*Math.sin(d);
+		}
+		function movepaddle(n) {
+			p+=n
+			if (p < R) p = R;
+			else if (p > W-V) p = W-V;
+		}
+		function bounce() {
+			setball();
+			show();
+		}
+		function init() {
+			x = W/2;
+			y = H/2;
+			d = Math.random() * Math.PI/2 + Math.PI/4;
+			p = px = W/3;
+			l = 40;
+			n=YN*XN;
+			a = [];
+			for (var i=0; i<n; i++) {
+				a[i] = 10+R + (i%XN)*W/XN;
+			}
+ 			g = c.readOnly?Math.random():c.checked?0:1;
+			m.innerHTML = "[" + g.toPrecision(2) + "]Pi";
+			g*=Math.PI;
+			show();
+			stop("Click toggle to start game")
+		}
+		function stop(s) {
+			clearInterval(t);
+			t = undefined;
+			mesg(s);
+		}
+ 		return {
+			toggle: function () {
+				if (t != undefined) 
+					stop()
+				else 
+					t = setInterval(bounce, l)
+			},
+			restart: function () {
+				init();
+			},
+			check: function() {
+				if (c.readOnly) c.checked=c.readOnly=false;
+				else if (!c.checked) c.readOnly=c.indeterminate=true;
+			} 
+		}
+	}
+	var ap;
+	</script>
+</head>
+<body>
+<center>
+<h1>Bounce Back Game</h1>
+<p>practice of javascript functional programming</p>
+<button onClick="ap.restart()" > restart </button>
+<button onClick="ap.toggle()" > toggle </button>
+option:<input id='chk' type='checkbox' checked onclick="ap.check()"/>
+<snap id='msg'></snap>
+<br/><br/>
+<div>
+<canvas id='cvs' width="300" height="400" style="border:1px solid #d3d3d3;">
+	Your browser does not support the HTML5 canvas tag.
+</canvas>
+</div>
+<p> hold mouse down moving or use arow keys to play bounce back</p>
+<script>
+	ap = pp('cvs', 'chk', 'msg'); 
+	ap.restart();
+</script>
+</body>
+</html> 

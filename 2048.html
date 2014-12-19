@@ -67,12 +67,29 @@
     }
     span {
         font-size: 3.2em;
+        font-weight: bold;
+        font-style: italic;
         color: #a0a0a0;
+    }
+    #msg {
+        background-color: #feeeef;
+        border: 3px solid #101010;
+        border-radius: 25px;
+        color: #aa3355;
+        padding: 25px;
+        width: 400px;
+        position: relative;
+        top: -400px;
+        opacity: 0.6;
+        filter: alpha(opacity=60); /* For IE8 and earlier */
+        visibility: hidden;
+        font-size: 1.6em;
     }
     </style>
 	<script>
-       function cubes (id) {
+       function cubes (id, mid) {
             var bd = document.getElementById(id);
+            var msg = document.getElementById(mid);
             var num = []
             var fnum 
             var tls = document.getElementsByTagName("TH")
@@ -86,8 +103,16 @@
                 if (best < score) best = score
                 tls[1].innerHTML = "Best: " + best
             }
+            function disp() {
+                msg.style.visibility = "hidden"
+            }
+            function mesg(s) {
+                msg.innerHTML = s;
+                msg.style.visibility = "visible"
+                setTimeout(disp, 4000 + s.length*20)
+            }
             function help() {
-                alert("    The goal is to get a single square to be 2048.   Get two of the same number next to each other to add them together. \n    Use the arrow keys to add squares together.  ")
+                mesg(" The goal is to get a single square to be 2048.   Get two of the same number next to each other to add them up.<br>Use the arrow keys to add squares together.  ")
             }
             function kydn(e) {
                 e = e || event;
@@ -125,40 +150,33 @@
                     num[d] = 0
                     n--
                 }
-                if (num[b] == 0) {
-                    n = 2
-                    while(num[b] == 0 && n > 0) {
-                        score += num[b]
-                        num[b] = num[c]
-                        num[c] = num[d]
-                        num[d] = 0
-                        n--
-                    }
-                }
-                else {
-                    if (num[a] == num[b]) {
-                        score += num[b]
-                        num[a] += num[b]
-                        num[b] = num[c]
-                        num[c] = num[d]
-                        num[d] = 0
-                        fnum--
-                    }
-                }
+                n = 2
+                while (num[b] == 0 && n > 0) {
+                    num[b] = num[c]
+                    num[c] = num[d]
+                    num[d] = 0
+                    n--
+                }               
                 if (num[c] == 0) {
                     num[c] = num[d]
                     num[d] = 0
                 }
-                else {
-                    if (num[b] == num[c]) {
-                        score += num[b]
-                        num[b] += num[c]
-                        num[c] = num[d]
-                        num[d] = 0
-                        fnum--
-                    }
+                if (num[a] != 0 && num[a] == num[b]) {
+                    score += num[b]
+                    num[a] += num[b]
+                    num[b] = num[c]
+                    num[c] = num[d]
+                    num[d] = 0
+                    fnum--
                 }
-                if (num[d] != 0 && num[c] == num[d]) {
+                if (num[b] != 0 && num[b] == num[c]) {
+                    score += num[b]
+                    num[b] += num[c]
+                    num[c] = num[d]
+                    num[d] = 0
+                    fnum--
+                }
+                if (num[c] != 0 && num[c] == num[d]) {
                     score += num[c]
                     num[c] += num[d]
                     num[d] = 0
@@ -193,7 +211,7 @@
                     break;
                 }
                 if (fnum == 16) {
-                    alert("You lost game, do again")
+                    mesg("You lost the game, try again")
                     init()
                     set(2)
                 }
@@ -220,7 +238,7 @@
                 }
                 upview()
                 if (f == 2048) {
-                    alert("Congratulation! You win")
+                    mesg("Congratulation! You win")
                 }
             }
             function rset() {
@@ -252,10 +270,10 @@
         <th class="cmd">New Game</th>
         <th class="cmd">Help</th>
     </tr></table> <br>
-    <table id="outside">
-    </table>
+    <table id="outside"></table>
+    <div id="msg"/>
 <script> 
-    cb=cubes("outside").init(); 
+    cb=cubes("outside", "msg").init(); 
 </script>
 </body>
 </html>

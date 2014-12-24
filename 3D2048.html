@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>3D2048</title>
+	<script>
+	/*
+	 *	      Slide Blok Puzzle
+	 *         	Howard Xu
+	 *        Dec. 21, 2014
+	 */
+    </script>
+    <style>
+    #outside {
+        border: 2px solid #a0a0a0;
+        width: 520px;
+        height: 520px;
+    }
+    th {
+        border:4px solid #c0c0c0;
+        background-color: #6a7a8a;
+        color: #f0f0f0;
+        width: 110px;
+    }
+    .cmd {
+        cursor: pointer;
+        border-radius: 10px;
+    }
+    #msg {
+        background-color: #feeeef;
+        border: 3px solid #101010;
+        border-radius: 25px;
+        color: #aa3355;
+        padding: 25px;
+        width: 400px;
+        position: relative;
+        top: -400px;
+        visibility: hidden;
+        font-size: 1.6em;
+    }
+    circle {
+        stroke: yellow;
+        stroke-width: 1px;
+    }
+    rect {
+        stroke: pink;
+        stroke-width: 1px;
+        fill-opacity:0;
+    }
+    text {
+        font-weight: bold;
+        font-style: italic;
+    }
+    linearGradient { 
+        x1: 0%;
+        y1: 0%;
+        x2: 100%
+        y2: 0%
+    }
+    </style>
+	<script>
+       function cubes (id, mid) {
+            var bd = document.getElementById(id);
+            var msg = document.getElementById(mid);
+            var num = []
+            var fnum 
+            var tls = document.getElementsByTagName("TH")
+            var score = 0
+            var best = 0
+            var color =[
+                "#a8a8a8",
+                "#ffebc2",
+                "#ffcc66",
+                "#ffbb00",
+                "#ff9966",
+                "#ff6600",
+                "#aaff66",
+                "#55aaff",
+                "#557799",
+                "#afafff",
+                "#5f5fff",
+                "#5f5f99"
+                ] 
+            var syb =[]
+            syb[0] = 0
+            k = 2
+            for (i=1; i<12; i++) {
+                syb.push(k)
+                k *= 2
+            }
+            tls[2].addEventListener("click", restart, false);
+            tls[3].addEventListener("click", help, false);
+            addEventListener("keydown", kydn, false);
+            function upview() {
+                tls[0].innerHTML = "Score: " + score
+                if (best < score) best = score
+                tls[1].innerHTML = "Best: " + best
+            }
+            function disp() {
+                msg.style.visibility = "hidden"
+            }
+            function mesg(s) {
+                msg.innerHTML = s;
+                msg.style.visibility = "visible"
+                setTimeout(disp, 4000 + s.length*20)
+            }
+            function help() {
+                mesg(" The goal is to get a single circl to be 2048.   Get two of the same number next to each other to add them up.<br>Use the arrow keys and (in key) 'I', '1', (out key) 'O', '0' to add circle together.  ")
+            }
+            function kydn(e) {
+                e = e || event;
+                switch(e.keyCode) {
+                    case 37: dmerge(0);		// left
+                    break;
+                    case 38: dmerge(1);		// up
+                    break;
+                    case 39: dmerge(2);		// right
+                    break;
+                    case 40: dmerge(3);		// down
+                    break;
+                    case 73:                // In
+                    case 49: dmerge(4);	    // 1
+                    break;
+                    case 79:                // Out
+                    case 48: dmerge(5);     // 0
+                    break;
+                    default:
+                }
+            }
+            function gengradient(i) {
+                return '<linearGradient id="G_' + syb[i] + '"> <stop offset="0%" style="stop-color:rgb(255,255,255);stop-opacity:1" /><stop offset="100%" style="stop-color:' + color[i] + ';stop-opacity:1" /></linearGradient>'
+            }
+            function init() {
+                
+                for (i=0; i<27; i++) {
+                    num[i] = 0
+                 }
+                s = "<defs>";
+                for (i = 0; i < 12; i++)
+                    s += gengradient(i)
+                s += "</defs>"
+                k = 0
+                s += '<rect x="50" y="50" width="310" height="310" />'
+                for (i=0; i<3; i++) 
+                    for (j=0; j<3; j++)  {
+                        s += '<circle id ="C_' + k + '" cx="' + (50 + j*155) + '" cy="' + (50 + i*155) + '" r="40" fill="url(#G_64)" /> <text id="T_' + k + '" x="' + (30 + j*155) + '" y="' + (60 + i*155) + '" font-size="23px">12</text>'
+                        k++
+                    }
+                s += '<rect x="90" y="90" width="310" height="310" />'
+                for (i=0; i<3; i++) 
+                    for (j=0; j<3; j++)  {
+                        s += '<circle id ="C_' + k + '" cx="' + (90 + j*155) + '" cy="' + (90 + i*155) + '" r="46"  fill="url(#G_128)" /> <text id="T_' + k + '" x="' + (70 + j*155) + '" y="' + (100 + i*155) + '" font-size="33px">34</text>'
+                        k++
+                    }
+                s += '<rect x="135" y="135" width="320" height="310" />'
+                for (i=0; i<3; i++) 
+                    for (j=0; j<3; j++)  {
+                       s += '<circle id ="C_' + k + '" cx="' + (135 + j*160) + '" cy="' + (135 + i*160) + '" r="52" fill="url(#G_256)" /> <text id="T_' + k + '" x="' + (105 + j*155) + '" y="' + (150 + i*160) + '" font-size="43px">567</text>'
+                        k++
+                    }
+                fnum = 0
+                score = 0
+                bd.innerHTML = s
+            }
+            function merge(a, b, c) {
+                n = 2
+                while (num[a] == 0 && n > 0) {
+                    num[a] = num[b]
+                    num[b] = num[c]
+                    num[c] = 0
+                    n--
+                }
+                if (num[b] == 0) {
+                    num[b] = num[c]
+                    num[c] = 0
+                }
+                if (num[a] != 0 && num[a] == num[b]) {
+                    score += num[b]
+                    num[a] += num[b]
+                    num[b] = num[c]
+                    num[c] = 0
+                    fnum--
+                }
+                if (num[b] != 0 && num[b] == num[c]) {
+                    score += num[b]
+                    num[b] += num[c]
+                    num[c] = 0
+                    fnum--
+                }
+            }
+            function dmerge(n) {
+               switch(n) {
+                    case 0: // left
+                        merge(0, 1, 2)
+                        merge(3, 4, 5)
+                        merge(6, 7, 8)
+                        
+                        merge(9, 10, 11)
+                        merge(12,13, 14)
+                        merge(15,16, 17)
+                        
+                        merge(18,19, 20)
+                        merge(21,22, 23)
+                        merge(24,25, 26)
+                    break;
+                    case 1: // up
+                        merge(0, 3, 6)
+                        merge(1, 4, 7)
+                        merge(2, 5, 8)
+                        
+                        merge(9, 12, 15)
+                        merge(10,13, 16)
+                        merge(11,14, 17)
+                        
+                        merge(18,21, 24)
+                        merge(19,22, 25)
+                        merge(20,23, 26)
+                    break;
+                    case 2: // right
+                        merge(2, 1, 0)
+                        merge(5, 4, 3)
+                        merge(8, 7, 6)
+                        
+                        merge(11, 10, 9)
+                        merge(14,13, 12)
+                        merge(17,16, 15)
+                        
+                        merge(20,19, 18)
+                        merge(23,22, 21)
+                        merge(26,25, 24)
+                    break;
+                    case 3: // down
+                        merge(6, 3, 0)
+                        merge(7, 4, 1)
+                        merge(8, 5, 2)
+                        
+                        merge(15, 12, 9)
+                        merge(16,13, 10)
+                        merge(17,14, 11)
+                        
+                        merge(24,21, 18)
+                        merge(25,22, 19)
+                        merge(26,23, 20)
+                    break;
+                    case 4: // in
+                        merge(0, 9, 18)
+                        merge(1, 10, 19)
+                        merge(2, 11, 20)
+                        
+                        merge(3, 12, 21)
+                        merge(4, 13, 22)
+                        merge(5, 14, 23)
+                        
+                        merge(6 ,15, 24)
+                        merge(7 ,16, 25)
+                        merge(8 ,17, 26)
+                    break;
+                    case 5: // out
+                        merge(18, 9, 0)
+                        merge(19, 10, 1)
+                        merge(20, 11, 2)
+                        
+                        merge(21, 12, 3)
+                        merge(22, 13, 4)
+                        merge(23, 14, 5)
+                        
+                        merge(24 ,15, 6)
+                        merge(25 ,16, 7)
+                        merge(26 ,17, 8)
+                    break;
+                }
+                if (fnum == 27) {
+                    mesg("You lost the game, try again")
+                    init()
+                    set(2)
+                }
+                rset()
+                show()
+            }
+            function set(n) {
+                k = Math.floor(Math.random() * 27)
+                while(fnum < 27 && num[k] != 0) 
+                    k = Math.floor(Math.random() * 27)
+                num[k] = n
+                fnum++
+            }
+            function show() {
+                f = 0
+                for (i=0; i<27; i++) {
+                    s = ""
+                    if(num[i] != 0) s+= num[i]
+                    document.getElementById("T_"+i).innerHTML = s
+                    document.getElementById("C_"+i).setAttribute("fill", "url(#G_" + num[i] + ")");
+                    if (f < num[i]) f = num[i]
+                }
+    
+                upview()
+                if (f == 2048) {
+                    mesg("Congratulation! You win")
+                }
+            }
+            function rset() {
+                if (Math.random() > 0.5)
+                    set(4)
+                else
+                    set(2);
+            }
+            function restart() {
+                init()
+                set(2);
+                rset();
+                show()
+            }
+            return {
+                init: function() {
+                    restart();
+                }
+            }
+        }
+        var cb;
+     </script>
+</head>
+<body>
+    <center>
+    <table><tr>
+        <th></th>
+        <th></th>
+        <th class="cmd">New Game</th>
+        <th class="cmd">Help</th>
+    </tr></table> <br>
+    <svg id="outside"></svg>
+    <div id="msg"/>
+<script> 
+    cb=cubes("outside", "msg").init(); 
+</script>
+</body>
+</html>

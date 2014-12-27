@@ -10,7 +10,7 @@
 	 */
     </script>
     <style>
-    #outside {
+    svg {
         border: 2px solid #a0a0a0;
         width: 520px;
         height: 520px;
@@ -41,7 +41,7 @@
         stroke: yellow;
         stroke-width: 1px;
     }
-    rect {
+    rect, line {
         stroke: pink;
         stroke-width: 1px;
         fill-opacity:0;
@@ -58,12 +58,10 @@
     }
     </style>
 	<script>
-       function cubes (id, mid) {
-            var bd = document.getElementById(id);
-            var msg = document.getElementById(mid);
-            var num = []
-            var fnum 
-            var tls = document.getElementsByTagName("TH")
+        function cubes () {
+            var msg
+            var tls
+            var fnum  
             var score = 0
             var best = 0
             var color =[
@@ -79,7 +77,8 @@
                 "#afafff",
                 "#5f5fff",
                 "#5f5f99"
-                ] 
+                ]
+            var num = []
             var syb =[]
             syb[0] = 0
             k = 2
@@ -87,21 +86,18 @@
                 syb.push(k)
                 k *= 2
             }
-            tls[2].addEventListener("click", restart, false);
-            tls[3].addEventListener("click", help, false);
-            addEventListener("keydown", kydn, false);
             function upview() {
                 tls[0].innerHTML = "Score: " + score
                 if (best < score) best = score
                 tls[1].innerHTML = "Best: " + best
             }
-            function disp() {
+            function hide() {
                 msg.style.visibility = "hidden"
             }
             function mesg(s) {
                 msg.innerHTML = s;
                 msg.style.visibility = "visible"
-                setTimeout(disp, 4000 + s.length*20)
+                setTimeout(hide, 4000 + s.length*20)
             }
             function help() {
                 mesg(" The goal is to get a single circl to be 2048.   Get two of the same number next to each other to add them up.<br>Use the arrow keys and (in key) 'I', '1', (out key) 'O', '0' to add circle together. Also support keys: L(eft),H; U(p), R(ight),J; D(own),N; F(ront), B(ack) ")
@@ -134,16 +130,13 @@
                     break;
                     default:
                 }
+                hide()
             }
             function gengradient(i) {
                 return '<linearGradient id="G_' + syb[i] + '"> <stop offset="0%" style="stop-color:rgb(255,255,255);stop-opacity:1" /><stop offset="100%" style="stop-color:' + color[i] + ';stop-opacity:1" /></linearGradient>'
             }
-            function init() {
-                
-                for (i=0; i<27; i++) {
-                    num[i] = 0
-                 }
-                s = "<defs>";
+            function getdoc() {
+                s = "<svg><defs>";
                 for (i = 0; i < 12; i++)
                     s += gengradient(i)
                 s += "</defs>"
@@ -155,6 +148,8 @@
                         k++
                     }
                 s += '<rect x="90" y="90" width="310" height="310" />'
+                s += '<line x1="90" y1="245" x2="400" y2="245" />'
+                s += '<line x1="245" y1="90" x2="245" y2="400" />'
                 for (i=0; i<3; i++) 
                     for (j=0; j<3; j++)  {
                         s += '<circle id ="C_' + k + '" cx="' + (90 + j*155) + '" cy="' + (90 + i*155) + '" r="46"  fill="url(#G_128)" /> <text id="T_' + k + '" x="' + (70 + j*155) + '" y="' + (100 + i*155) + '" font-size="33px">34</text>'
@@ -166,9 +161,18 @@
                        s += '<circle id ="C_' + k + '" cx="' + (135 + j*160) + '" cy="' + (135 + i*160) + '" r="52" fill="url(#G_256)" /> <text id="T_' + k + '" x="' + (105 + j*155) + '" y="' + (150 + i*160) + '" font-size="43px">567</text>'
                         k++
                     }
+                return s += '</svg><div id="msg"/>'
+            }
+            function init() {
+                msg = document.getElementsByTagName("DIV")[0]
+                tls = document.getElementsByTagName("TH")
+                tls[2].addEventListener("click", restart, false);
+                tls[3].addEventListener("click", help, false);
+                addEventListener("keydown", kydn, false);
+                for (i=0; i<27; i++) 
+                    num[i] = 0
                 fnum = 0
                 score = 0
-                bd.innerHTML = s
             }
             function merge(a, b, c) {
                 n = 2
@@ -297,11 +301,10 @@
                 for (i=0; i<27; i++) {
                     s = ""
                     if(num[i] != 0) s+= num[i]
-                    document.getElementById("T_"+i).innerHTML = s
+                    document.getElementById("T_"+i).textContent = s
                     document.getElementById("C_"+i).setAttribute("fill", "url(#G_" + num[i] + ")");
                     if (f < num[i]) f = num[i]
                 }
-    
                 upview()
                 if (f == 2048) {
                     mesg("Congratulation! You win")
@@ -322,10 +325,12 @@
             return {
                 init: function() {
                     restart();
+                },
+                getsvg: function() {
+                    return getdoc();
                 }
             }
         }
-        var cb;
      </script>
 </head>
 <body>
@@ -336,10 +341,10 @@
         <th class="cmd">New Game</th>
         <th class="cmd">Help</th>
     </tr></table> <br>
-    <svg id="outside"></svg>
-    <div id="msg"/>
 <script> 
-    cb=cubes("outside", "msg").init(); 
+    cb=cubes()
+    document.write(cb.getsvg())
+    cb.init(); 
 </script>
 </body>
 </html>

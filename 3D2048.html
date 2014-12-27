@@ -128,9 +128,8 @@
                     case 79:                // Out
                     case 48: dmerge(5);     // 0
                     break;
-                    default:
+                    default: hide();
                 }
-                hide()
             }
             function gengradient(i) {
                 return '<linearGradient id="G_' + syb[i] + '"> <stop offset="0%" style="stop-color:rgb(255,255,255);stop-opacity:1" /><stop offset="100%" style="stop-color:' + color[i] + ';stop-opacity:1" /></linearGradient>'

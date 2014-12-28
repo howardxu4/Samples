@@ -42,9 +42,17 @@
         stroke-width: 1px;
     }
     rect, line {
-        stroke: pink;
         stroke-width: 1px;
-        fill-opacity:0;
+        fill-opacity: 0;
+    }
+    .r {
+        stroke: #ffaacc;
+    }
+    .g {
+        stroke: #aaffcc;
+    }
+    .b {
+        stroke: #aaccff;
     }
     text {
         font-weight: bold;
@@ -140,21 +148,25 @@
                     s += gengradient(i)
                 s += "</defs>"
                 k = 0
-                s += '<rect x="50" y="50" width="310" height="310" />'
+                s += '<rect x="50" y="50" width="310" height="310" class="r"/>'
+                s += '<line x1="50" y1="205" x2="360" y2="205" class="r"/>'
+                s += '<line x1="205" y1="50" x2="205" y2="360" class="r"/>'
                 for (i=0; i<3; i++) 
                     for (j=0; j<3; j++)  {
                         s += '<circle id ="C_' + k + '" cx="' + (50 + j*155) + '" cy="' + (50 + i*155) + '" r="40" fill="url(#G_64)" /> <text id="T_' + k + '" x="' + (30 + j*155) + '" y="' + (60 + i*155) + '" font-size="23px">12</text>'
                         k++
                     }
-                s += '<rect x="90" y="90" width="310" height="310" />'
-                s += '<line x1="90" y1="245" x2="400" y2="245" />'
-                s += '<line x1="245" y1="90" x2="245" y2="400" />'
+                s += '<rect x="90" y="90" width="310" height="310" class="g"/>'
+                s += '<line x1="90" y1="245" x2="400" y2="245" class="g"/>'
+                s += '<line x1="245" y1="90" x2="245" y2="400" class="g"/>'
                 for (i=0; i<3; i++) 
                     for (j=0; j<3; j++)  {
                         s += '<circle id ="C_' + k + '" cx="' + (90 + j*155) + '" cy="' + (90 + i*155) + '" r="46"  fill="url(#G_128)" /> <text id="T_' + k + '" x="' + (70 + j*155) + '" y="' + (100 + i*155) + '" font-size="33px">34</text>'
                         k++
                     }
-                s += '<rect x="135" y="135" width="320" height="310" />'
+                s += '<rect x="135" y="135" width="320" height="310" class="b"/>'
+                s += '<line x1="135" y1="295" x2="446" y2="295" class="b"/>'
+                s += '<line x1="295" y1="135" x2="295" y2="455" class="b"/>'
                 for (i=0; i<3; i++) 
                     for (j=0; j<3; j++)  {
                        s += '<circle id ="C_' + k + '" cx="' + (135 + j*160) + '" cy="' + (135 + i*160) + '" r="52" fill="url(#G_256)" /> <text id="T_' + k + '" x="' + (105 + j*155) + '" y="' + (150 + i*160) + '" font-size="43px">567</text>'

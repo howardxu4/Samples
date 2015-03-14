@@ -51,7 +51,10 @@
 	// normal parse
 	myParser.prototype.op = function(kk, k, hh, h, s) {
 		if (kk > 0) {
-			this.update(s.substring(hh,hh+1));
+                    t = s.charAt(hh);
+                    if (t >= '0' && t <= '9')
+                        t = s.substring(hh,h);
+		    this.update(t);
 		}
 		return h;
 	}

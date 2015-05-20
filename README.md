@@ -20,4 +20,4 @@ Contains
 URL
 ---
 
- [howardxu-games](http://howardxu.freetzi.com/games/)
+ [howardxu-games](http://howardxu.comxa.com)

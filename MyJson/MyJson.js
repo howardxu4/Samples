@@ -181,7 +181,8 @@ function MyJson(){
         while (c != null) {
             if (c.length == 1)
                 if (allow.indexOf(c) == -1)
-                    return this.myseterror("@@@ Syntax error!!! ")
+                    if (!isNaN(c))
+                        return this.myseterror("@@@ Syntax error!!! ")
             if (c == '{') {
                 this.myprint ("Create OBJECT") 
                 this.mypush({})

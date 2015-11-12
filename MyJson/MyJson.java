@@ -81,7 +81,7 @@ public class MyJson {
         return null;
     }
     
-    public String mygetindent(int l){
+    private String mygetindent(int l){
         String s = "";
         for (int i = 0; i < l*this.number; i++)
             s += " ";
@@ -95,7 +95,7 @@ public class MyJson {
             this.rtn = "\n";
     }
     
-    public void mysetstr(String line){
+    private void mysetstr(String line){
         this.line = line;
         this.start = 0;
         this.index = 0;
@@ -201,7 +201,8 @@ public class MyJson {
         while (c != null) {
             if (c.length() == 1)
                 if (allow.indexOf(c) == -1)
-                    return this.myseterror("@@@ Syntax error!!! ");
+                    if (!Character.isDigit(c.charAt(0)))
+                        return this.myseterror("@@@ Syntax error!!! ");
             if (c.equals("{") ) {
                 this.myprint ("Create OBJECT");
                 this.mypush(new HashMap<String, Object>());

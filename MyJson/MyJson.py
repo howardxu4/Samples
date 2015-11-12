@@ -147,7 +147,8 @@ class MyJson(object):
         while c != None:
             if len(c) == 1:
                 if not (c in allow):
-                    return self.myseterror("@@@ Syntax error!!! ")
+                    if not c.isdigit():
+                        return self.myseterror("@@@ Syntax error!!! ")
             if c == '{':
                 self.myprint ("Create OBJECT") 
                 self.mypush({})

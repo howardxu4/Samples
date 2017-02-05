@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Alter Tetris</title>
+    <script>
+        /*
+         *        Alter Tetris
+         *         Howard Xu
+         *        Jan. 29, 2017
+         */
+    </script>
+    <style>
+    #e_1, #e_2, #e_3 {
+       float: left;
+    }
+    th {
+        border:4px solid #c0c0c0;
+        background-color: #6a7a8a;
+        color: #f0f0f0;
+        width: 110px;
+    }
+    .cmd {
+        cursor: pointer;
+        border-radius: 10px;
+    }
+    td {
+        border:12px solid #c0c0c0;
+        width: 25%;
+        height: 25%;
+    }
+    #msg {
+        background-color: #feeeef;
+        border: 3px solid #101010;
+        border-radius: 25px;
+        color: #aa3355;
+        padding: 25px;
+        width: 400px;
+        position: absolute; 
+        top: 200px;
+	left: 30px;
+        opacity: 0.8;
+        filter: alpha(opacity=80); /* For IE8 and earlier */
+        visibility: hidden;
+        font-size: 1.6em;
+    }
+    </style>
+    <script src='scripts/hexagonobj.js'></script>
+    <script src='scripts/tetrisobj.js'></script>
+    <script>
+    function AltTetris(nm, e0, e1, e2, e3) {
+
+      function savescore(n) {
+        if (typeof(Storage) !== 'undefined') {
+          if (n > 0) localStorage.setItem('bestscore', n)
+          else if (localStorage.getItem('bestscore') != null)
+            n = localStorage.getItem('bestscore')
+        }
+        return n
+      }
+
+      function upview(score, k) {
+        tls[0].innerHTML = "Score: " + score
+        if (best < score) {
+          best = savescore(score)
+        }  
+        tls[1].innerHTML = "Best: " + best
+        if (k > 1) {
+          var m = 'Cool! You completed double lines'
+          if (k == 3)
+	    m = 'Beatifull! You got the triple lines'
+          else if (k > 3)
+	    m = 'Superio! You made multiple lines'
+	  mesg(m, k * 1000)
+        }
+      }
+
+      function disp() {
+        msg.style.visibility = "hidden"
+      }  
+
+      function mesg(s, tm=4000) {
+        msg.innerHTML = s;
+        msg.style.visibility = "visible"
+        setTimeout(disp, tm + s.length*20)
+      }
+
+      function help() {
+        mesg("The goal of game is to get as most score as you can through drag and drop the sample pattern to the board space, when the full filled the line (horizontal or sloped), its spaces are freed again and get more score. To consider the best space you are going to filling and have a fun!  ")
+      }    
+
+      var comments = [
+         "Are you kidding?",
+         "It is joke!",
+         "You need improve your skill.",
+         "Hope next time you can do better.",
+         "You are still under normal level.",
+         "You are normal level now.",
+         "Good job you done!",
+         "Excelent! Continue..",
+         "You are ubove normal level.",
+         "You are smart!",
+         "You can show your score to your friend.",
+         "Unbelivable!",
+         "Congratulation! You are belong the best."
+      ]
+
+      function result() {
+        var r = tls[0].innerHTML
+        var n = parseInt(r.substring(7))
+        var k = Math.round(n / 2000)
+        if (k > 4) {
+          k = Math.round(n / 5000) + 4
+        if (k >= comments.length)
+          k = comments.length - 1 
+        } 
+        mesg("No place to put in, you get score: " + n + " " + comments[k] + "     Try again?") 
+      }  
+
+      function init() {
+        upview(0)
+        mt.dispall()
+        mt.dispone(1)
+        mt.dispone(2)
+        mt.dispone(3)
+        mt.setcoord()
+      }  
+
+      this.allowDrop = function(ev){
+        ev.preventDefault(ev)
+      }
+ 
+      this.drag = function(ev) {
+        mt.drag(ev)
+      }
+
+      this.drop = function(ev) {
+        mt.drop(ev)
+      }  
+
+      var mt = new TetrisObj(e0, e1, e2, e3, upview, result)
+      mt.hexagon.init()
+      var  tls = document.getElementsByTagName("TH")
+      tls[2].addEventListener("click", init, false);
+      tls[3].addEventListener("click", help, false);
+      var best = savescore(0)
+      this.mt = mt.setname(nm + '.mt')
+      init()
+    }
+    </script>
+</head>
+
+<body>
+  <svg id='cnvs' height="130" width="400" ">
+    <defs>
+      <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="0%">
+        <stop offset="0%"
+        style="stop-color:rgb(255,255,0);stop-opacity:1" />
+        <stop offset="100%"
+        style="stop-color:rgb(255,0,0);stop-opacity:1" />
+      </linearGradient>
+    </defs>
+    <ellipse cx="200" cy="70" rx="150" ry="40" fill="url(#grad1)" />
+    <text fill="#ffffff" font-size="45" font-family="Verdana"
+    x="70" y="86">Alter Tetris</text>
+    Sorry, your browser does not support inline SVG.
+  </svg>
+  <table><tr>
+    <th></th>
+    <th></th>
+    <th class="cmd">New Game</th>
+    <th class="cmd">Help</th>
+  </tr></table> <br>
+  <div id='e_0' ondrop="mb.drop(event)" ondragover="mb.allowDrop(event)"></div>
+  <div>
+    <div id='e_1' draggable="true" ondragstart="mb.drag(event)"></div>
+    <div id='e_2' draggable="true" ondragstart="mb.drag(event)"></div>
+    <div id='e_3' draggable="true" ondragstart="mb.drag(event)"></div>
+  </div>
+  <div id="msg">
+  </div>
+  <script>
+    var mb = new AltTetris('mb', 'e_0', 'e_1', 'e_2', 'e_3')
+  </script>
+</body>
+</html>

@@ -5,6 +5,8 @@ This is javascript samples project
 
 Contains
 --------
+* alttetris.html -- javascript object programming
+
 * 2048.html -- sample css and javascript functional programming 
 
 * 3D2048.html -- sample svg and javascript functional programming
@@ -20,4 +22,4 @@ Contains
 URL
 ---
 
- [howardxu-games](http://howardxu.comxa.com)
+ [howardxu-games](http://howardxu.x10host.com/games)

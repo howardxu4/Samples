@@ -25,6 +25,12 @@
         cursor: pointer;
         border-radius: 10px;
     }
+    span {
+        font-size: 3.2em;
+	font-weight: bold;
+	font-style: italic;
+	color: #a0a0a0;
+    }
     #msg {
         background-color: #feeeef;
         border: 3px solid #101010;
@@ -33,7 +39,7 @@
         padding: 25px;
         width: 400px;
         position: relative;
-        top: -400px;
+        top: -500px;
         visibility: hidden;
         font-size: 1.6em;
     }
@@ -88,6 +94,7 @@
                 ]
             var num = []
             var syb =[]
+	    var stev = undefined
             syb[0] = 0
             k = 2
             for (i=1; i<12; i++) {
@@ -108,7 +115,7 @@
                 setTimeout(hide, 4000 + s.length*20)
             }
             function help() {
-                mesg(" The goal is to get a single circl to be 2048.   Get two of the same number next to each other to add them up.<br>Use the arrow keys and (in key) 'I', '1', (out key) 'O', '0' to add circle together. Also support keys: L(eft),H; U(p), R(ight),J; D(own),N; F(ront), B(ack) ")
+                mesg(" The goal is to get a single circl to be 2048.   Get two of the same number next to each other to add them up.<br>Use the arrow keys and (in key) 'I', '1', (out key) 'O', '0' to add circle together. Also support keys: L(eft),H; U(p), R(ight),J; D(own),N; F(ront), B(ack) <br> Using mouse touch the Mv button slid the direction you want, or click Mv or O button for In or Out direction ")
             }
             function kydn(e) {
                 e = e || event;
@@ -184,7 +191,37 @@
                     num[i] = 0
                 fnum = 0
                 score = 0
+		btn = document.getElementsByTagName("button")
+		btn[0].addEventListener("click", cin, false)
+		btn[1].addEventListener("click",cout, false)
+		btn[0].addEventListener("mousedown", begin, false)
+		btn[0].addEventListener("mouseout", direct, false)
             }
+	    function cin(ev) {
+	      dmerge(4)
+	      stev = undefined
+	    }
+	    function cout(ev) {
+	      dmerge(5)
+	    }
+	    function begin(ev) {
+	      stev = ev
+	    }
+	    function direct(ev) {
+	      if (stev != undefined) {
+	         var x = ev.screenX - stev.screenX
+		 var y = ev.screenY - stev.screenY
+		 var d = 3;
+		 if (Math.abs(x) > Math.abs(y)) {
+		   if (x > 0) d = 2
+		   else d = 0
+		 }
+		 else if (y < 0)
+		   d = 1
+		 dmerge(d)
+		 stev = undefined  
+	      }
+	    }
             function merge(a, b, c) {
                 n = 2
                 while (num[a] == 0 && n > 0) {
@@ -352,6 +389,8 @@
         <th class="cmd">New Game</th>
         <th class="cmd">Help</th>
     </tr></table> <br>
+    <button><span>Mv</span></button>
+    <button><span>O</span></button>
 <script> 
     cb=cubes()
     document.write(cb.getsvg())

@@ -96,9 +96,31 @@
             var tls = document.getElementsByTagName("TH")
             var score = 0
             var best = 0
+	    var stev = undefined
             tls[2].addEventListener("click", restart, false);
             tls[3].addEventListener("click", help, false);
             addEventListener("keydown", kydn, false);
+	    var btn = document.getElementsByTagName("button")
+            btn[0].addEventListener("mousedown", begin, false);
+	    btn[0].addEventListener("mouseout", direct, false);
+	    function begin(ev) {
+	      stev = ev
+	    }
+	    function direct(ev) {
+	      if (stev != undefined) {
+	        var x = ev.screenX - stev.screenX;
+		var y = ev.screenY - stev.screenY;
+		var d = 3
+		if (Math.abs(x) > Math.abs(y)) {
+		  if (x > 0) d = 2
+		  else d = 0
+		}
+		else if (y < 0)
+		  d = 1
+		dmerge(d)
+		stev = undefined
+	      }
+	    }
             function upview() {
                 tls[0].innerHTML = "Score: " + score
                 if (best < score) best = score
@@ -113,7 +135,7 @@
                 setTimeout(disp, 4000 + s.length*20)
             }
             function help() {
-                mesg(" The goal is to get a single square to be 2048.   Get two of the same number next to each other to add them up.<br>Use the arrow keys to add squares together. Also support keys: L(eft),H; U(p), R(ight),J; D(own),N ")
+                mesg(" The goal is to get a single square to be 2048.   Get two of the same number next to each other to add them up.<br>Use the arrow keys to add squares together. Also support keys: L(eft),H; U(p), R(ight),J; D(own),N  <br>   Using mouse touch the Mv button slid the direction you wnat ")
             }
             function kydn(e) {
                 e = e || event;
@@ -279,6 +301,8 @@
         <th class="cmd">Help</th>
     </tr></table> <br>
     <table id="outside"></table>
+    <br>
+    <button><span>Mv</span></button>
     <div id="msg"/>
 <script> 
     cb=cubes("outside", "msg").init(); 

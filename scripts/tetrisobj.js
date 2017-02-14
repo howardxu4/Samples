@@ -23,20 +23,15 @@ function TetrisObj(e0='e_0', e1='e_1', e2='e_2', e3='e_3',
     return this
   }
 
-  this.getOffset = function( el ) {
-    var _x = 0;
-    var _y = 0;
-    while( el && !isNaN( el.offsetLeft ) && !isNaN( el.offsetTop ) ) {
-      _x += el.offsetLeft - el.scrollLeft;
-      _y += el.offsetTop - el.scrollTop;
-      el = el.offsetParent;
-    }
-    return { top: _y, left: _x };
+  this.findOffset = function(el) {
+    for (var lx=0, ly=0, h=el.offsetHeight; el != null;
+      lx += el.offsetLeft, ly += el.offsetTop, el = el.offsetParent);
+    return {top:ly, left:lx};
   }
 
   this.setcoord = function(radius=40) {
     for (var n = 0; n < 4; n++) {
-      var lt = this.getOffset(document.getElementById('e_' + n))
+      var lt = this.findOffset(document.getElementById('e_' + n))
       if (n == 0) {
         this.coords[n][0] = lt.left + 255
         this.coords[n][1] = lt.top + 205
@@ -135,7 +130,6 @@ function TetrisObj(e0='e_0', e1='e_1', e2='e_2', e3='e_3',
           score += 20 * this.hexagon.stptlen[this.res[i][j]][1]
           k += 1
         }
-        // console.log('score: ' + i + ',' + this.res[i])
       }
     this.dispall()
     score *= k
@@ -159,6 +153,7 @@ function TetrisObj(e0='e_0', e1='e_1', e2='e_2', e3='e_3',
 
   this.drag = function(ev) { 
     var n = parseInt(ev.target.id[2])
+    ev.dataTransfer.setData("text", ev.target.id);  
     this.coords[0][2] = ev.clientX - this.coords[n][0]
     this.coords[0][3] = ev.clientY - this.coords[n][1]
     this.coords[4][0] = n

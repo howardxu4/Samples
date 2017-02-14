@@ -88,7 +88,7 @@ function HexagonObj(radius=200) {
 
   // for debug 
   this.showboard = function() {
-    for(var i in this.board)
+    for(var i = 0;i< 9; i++)
       console.log(this.board[i])
   }
 
@@ -185,7 +185,7 @@ function HexagonObj(radius=200) {
   this.chkonetype = function(r, c, shp) {
     //console.log(shp)
     for(var i in shp) {
-      var xy = this.getadjust(shp[i], r, c)
+      var xy = this.getadjust(shp[parseInt(i)], r, c)
       if (xy[0] < 0 || xy[0] > 8 || xy[1] < 0 || xy[1] > 8)
         return false
       if (this.board[xy[0]][ xy[1]] != 9)
@@ -199,7 +199,7 @@ function HexagonObj(radius=200) {
     shp = this.shape[t]
     for (var r=0; r<9; r++)
       for (var c=0; c<9; c++) 
-        if(this.board[r][c] == 9)
+        if(this.board[r][c] == 9 || t > 18)
           if(this.chkonetype(r, c, shp))
             return true
     return false
@@ -210,7 +210,7 @@ function HexagonObj(radius=200) {
     var shp = this.shape[t]
     if (this.chkonetype(r, c, shp)) {
       for (var i in shp) {
-        var xy = this.getadjust(shp[i], r, c)
+        var xy = this.getadjust(shp[parseInt(i)], r, c)
         this.board[xy[0]][ xy[1]] = clr
       }
       return true
@@ -297,9 +297,9 @@ function HexagonObj(radius=200) {
     this.entrytypes = []
     for (var t in this.shape) {
       var a = []
-      var shp = this.shape[t]
+      var shp = this.shape[parseInt(t)]
       for (var i in shp) 
-        a = a.concat(this.shapemap(shp[i], r, hr, b))
+        a = a.concat(this.shapemap(shp[parseInt(i)], r, hr, b))
       //console.log('('+t+') '+a)
       this.entrytypes.push(a)
     }

@@ -1,14 +1,11 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta http-equiv="cache-control" content="public">
+    <meta name="description" content="Alter Tetris">
+    <meta name="authors" content="Howard Xu">
     <title>Alter Tetris</title>
-    <script>
-        /*
-         *        Alter Tetris
-         *         Howard Xu
-         *        Jan. 29, 2017
-         */
-    </script>
     <style>
     #e_1, #e_2, #e_3 {
         float: left;
@@ -16,17 +13,12 @@
     th {
         border:4px solid #c0c0c0;
         background-color: #6a7a8a;
+	   border-radius: 10px;
         color: #f0f0f0;
         width: 110px;
     }
     .cmd {
         cursor: pointer;
-        border-radius: 10px;
-    }
-    td {
-        border:12px solid #c0c0c0;
-        width: 25%;
-        height: 25%;
     }
     #msg {
         background-color: #feeeef;
@@ -37,9 +29,9 @@
         width: 400px;
         position: absolute; 
         top: 200px;
-	left: 30px;
-        opacity: 0.8;
-        filter: alpha(opacity=80); /* For IE8 and earlier */
+	   left: 30px;
+        opacity: 0.7;
+        filter: alpha(opacity=70); /* For IE8 and earlier */
         visibility: hidden;
         font-size: 1.6em;
     }
@@ -47,7 +39,12 @@
     <script src='scripts/hexagonobj.js'></script>
     <script src='scripts/tetrisobj.js'></script>
     <script>
-    function AltTetris(nm, e0, e1, e2, e3) {
+        /*
+         *        Alter Tetris
+         *         Howard Xu
+         *        Jan. 29, 2017
+         */
+    function AltTetris(nm, e0, e1, e2, e3, msg) {
 
       function savescore(n) {
         if (typeof(Storage) !== 'undefined') {
@@ -58,34 +55,64 @@
         return n
       }
 
-      function upview(score, k) {
+      function doscore() {
+        if (this.sc[0] < this.sc[1]) {
+	  this.sc[0] += 20
+	  this.msg.innerHTML = this.sc[2] + this.sc[0]
+          setTimeout(doscore, 60)
+	}
+	else {
+	  disp()
+          showscore(this.sc[1])
+	}
+      }
+
+      function showscore(score) {
         tls[0].innerHTML = "Score: " + score
-        if (best < score) {
+        if (best < score) 
           best = savescore(score)
-        }  
         tls[1].innerHTML = "Best: " + best
+      }
+
+      function setscore(n, score, m) {
+        this.sc = [n, score, m]
+        this.msg.innerHTML = this.sc[2] + this.sc[0];
+        this.msg.style.visibility = "visible"
+	setTimeout(doscore, 60)
+      }
+
+      function upview(score, k) {
+        var r = tls[0].innerHTML 
+	var n = parseInt(r.substring(7))
+	var m = 'You got a full line  '
         if (k > 1) {
-          var m = 'Cool! You completed double lines'
+          var m = 'Cool! You completed double lines '
           if (k == 3)
-	    m = 'Beatifull! You got the triple lines'
+	    m = 'Beatifull! You got the triple lines '
           else if (k > 3)
-	    m = 'Superio! You made multiple lines'
-	  mesg(m, k * 1000)
+	    m = 'Superio! You made multiple lines '
         }
+        if (k) {
+	  setscore(n, score, m)
+	  if (!!window.chrome && !!window.chrome.webstore)
+            showscore(score)  
+        }
+	else
+          showscore(score)
       }
 
       function disp() {
-        msg.style.visibility = "hidden"
+        this.msg.style.visibility = "hidden"
       }  
 
       function mesg(s, tm=4000) {
-        msg.innerHTML = s;
-        msg.style.visibility = "visible"
+        this.msg.innerHTML = s;
+        this.msg.style.visibility = "visible"
         setTimeout(disp, tm + s.length*20)
       }
 
       function help() {
-        mesg("The goal of game is to get as most score as you can through drag and drop the sample pattern to the board space, when the full filled the line (horizontal or sloped), its spaces are freed again and get more score. To consider the best space you are going to filling and have a fun!  ")
+        mesg("The goal of the game is to get as most score as you can through drag and drop the sample pattern to the board space, when the the line (horizontal or sloped) be filled full, its spaces are freed and get more score. To consider the best space you are going to fill in and have a fun!  ")
       }    
 
       var comments = [
@@ -113,12 +140,13 @@
         if (k >= comments.length)
           k = comments.length - 1 
         } 
-        mesg("No place to put in, you get score: " + n + " " + comments[k] + "     Try again?") 
+        mesg("No place to put in, you get score: " + n + " " + comments[k] + "     Try again?")
+	   mt.hexagon.showboard()
       }  
 
       function init() {
         mt.hexagon.init()
-        upview(0)
+        showscore(0)
         mt.dispall()
         mt.dispone(1)
         mt.dispone(2)
@@ -144,26 +172,13 @@
       tls[3].addEventListener("click", help, false);
       var best = savescore(0)
       this.mt = mt.setname(nm + '.mt')
+      this.msg = document.getElementById('msg');
       init()
     }
     </script>
 </head>
 
 <body>
-  <svg id='cnvs' height="130" width="400" ">
-    <defs>
-      <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="0%">
-        <stop offset="0%"
-        style="stop-color:rgb(255,255,0);stop-opacity:1" />
-        <stop offset="100%"
-        style="stop-color:rgb(255,0,0);stop-opacity:1" />
-      </linearGradient>
-    </defs>
-    <ellipse cx="200" cy="70" rx="150" ry="40" fill="url(#grad1)" />
-    <text fill="#ffffff" font-size="45" font-family="Verdana"
-    x="70" y="86">Alter Tetris</text>
-    Sorry, your browser does not support inline SVG.
-  </svg>
   <table><tr>
     <th></th>
     <th></th>
@@ -178,7 +193,7 @@
   </div>
   <div id="msg"/>
   <script>
-    var mb = new AltTetris('mb', 'e_0', 'e_1', 'e_2', 'e_3')
+    var mb = new AltTetris('mb', 'e_0', 'e_1', 'e_2', 'e_3', 'msg')
   </script>
 </body>
 </html>

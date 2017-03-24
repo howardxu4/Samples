@@ -38,142 +38,27 @@
     </style>
     <script src='scripts/hexagonobj.js'></script>
     <script src='scripts/tetrisobj.js'></script>
+    <script src='scripts/alttetris.js'></script>
     <script>
-        /*
-         *        Alter Tetris
-         *         Howard Xu
-         *        Jan. 29, 2017
-         */
-    function AltTetris(nm, e0, e1, e2, e3, msg) {
 
-      function savescore(n) {
-        if (typeof(Storage) !== 'undefined') {
-          if (n > 0) localStorage.setItem('bestscore', n)
-          else if (localStorage.getItem('bestscore') != null)
-            n = localStorage.getItem('bestscore')
-        }
-        return n
-      }
-
-      function doscore() {
-        if (this.sc[0] < this.sc[1]) {
-	  this.sc[0] += 20
-	  this.msg.innerHTML = this.sc[2] + this.sc[0]
-          setTimeout(doscore, 60)
-	}
-	else {
-	  disp()
-          showscore(this.sc[1])
-	}
-      }
-
-      function showscore(score) {
-        tls[0].innerHTML = "Score: " + score
-        if (best < score) 
-          best = savescore(score)
-        tls[1].innerHTML = "Best: " + best
-      }
-
-      function setscore(n, score, m) {
-        this.sc = [n, score, m]
-        this.msg.innerHTML = this.sc[2] + this.sc[0];
-        this.msg.style.visibility = "visible"
-	setTimeout(doscore, 60)
-      }
-
-      function upview(score, k) {
-        var r = tls[0].innerHTML 
-	var n = parseInt(r.substring(7))
-	var m = 'You got a full line  '
-        if (k > 1) {
-          var m = 'Cool! You completed double lines '
-          if (k == 3)
-	    m = 'Beatifull! You got the triple lines '
-          else if (k > 3)
-	    m = 'Superio! You made multiple lines '
-        }
-        if (k) {
-	  setscore(n, score, m)
-	  if (!!window.chrome && !!window.chrome.webstore)
-            showscore(score)  
-        }
-	else
-          showscore(score)
-      }
-
-      function disp() {
-        this.msg.style.visibility = "hidden"
-      }  
-
-      function mesg(s, tm=4000) {
-        this.msg.innerHTML = s;
-        this.msg.style.visibility = "visible"
-        setTimeout(disp, tm + s.length*20)
-      }
-
-      function help() {
-        mesg("The goal of the game is to get as most score as you can through drag and drop the sample pattern to the board space, when the the line (horizontal or sloped) be filled full, its spaces are freed and get more score. To consider the best space you are going to fill in and have a fun!  ")
-      }    
-
-      var comments = [
-         "Are you kidding?",
-         "It is joke!",
-         "You need improve your skill.",
-         "Hope next time you can do better.",
-         "You are still under normal level.",
-         "You are normal level now.",
-         "Good job you done!",
-         "Excelent! Continue..",
-         "You are ubove normal level.",
-         "You are smart!",
-         "You can show your score to your friend.",
-         "Unbelivable!",
-         "Congratulation! You are belong the best."
-      ]
-
-      function result() {
-        var r = tls[0].innerHTML
-        var n = parseInt(r.substring(7))
-        var k = Math.round(n / 2000)
-        if (k > 4) {
-          k = Math.round(n / 5000) + 4
-        if (k >= comments.length)
-          k = comments.length - 1 
-        } 
-        mesg("No place to put in, you get score: " + n + " " + comments[k] + "     Try again?")
-	   mt.hexagon.showboard()
-      }  
-
-      function init() {
-        mt.hexagon.init()
-        showscore(0)
-        mt.dispall()
-        mt.dispone(1)
-        mt.dispone(2)
-        mt.dispone(3)
-        mt.setcoord()
-      }  
-
-      this.allowDrop = function(ev){
-        ev.preventDefault(ev)
-      }
+    function allowDrop (ev){
+      ev.preventDefault(ev)
+    }
  
-      this.drag = function(ev) {
-        mt.drag(ev)
-      }
+    function drag(ev, id) {
+      mb.mt.drag(ev, id)
+    }
 
-      this.drop = function(ev) {
-        mt.drop(ev)
-      }  
+    function drop(ev) {
+      mb.mt.drop(ev)
+    }  
 
-      var mt = new TetrisObj(e0, e1, e2, e3, upview, result)
-      var  tls = document.getElementsByTagName("TH")
-      tls[2].addEventListener("click", init, false);
-      tls[3].addEventListener("click", help, false);
-      var best = savescore(0)
-      this.mt = mt.setname(nm + '.mt')
-      this.msg = document.getElementById('msg');
-      init()
+    function init() {
+      mb.init()
+    }
+
+    function help() {
+      mb.help()
     }
     </script>
 </head>
@@ -182,18 +67,18 @@
   <table><tr>
     <th></th>
     <th></th>
-    <th class="cmd">New Game</th>
-    <th class="cmd">Help</th>
+    <th class="cmd" onclick="init()">New Game</th>
+    <th class="cmd" onclick="help()">Help</th>
   </tr></table> <br>
-  <div id='e_0' ondrop="mb.drop(event)" ondragover="mb.allowDrop(event)"></div>
+  <div id='e_0' ondrop="drop(event)" ondragover="allowDrop(event)"></div>
   <div>
-    <div id='e_1' draggable="true" ondragstart="mb.drag(event)"></div>
-    <div id='e_2' draggable="true" ondragstart="mb.drag(event)"></div>
-    <div id='e_3' draggable="true" ondragstart="mb.drag(event)"></div>
+    <div id='e_1' draggable="true" ondragstart="drag(event, 'e_1')"></div>
+    <div id='e_2' draggable="true" ondragstart="drag(event, 'e_2')"></div>
+    <div id='e_3' draggable="true" ondragstart="drag(event, 'e_3')"></div>
   </div>
-  <div id="msg"/>
+  <div id="msg"></div>
   <script>
-    var mb = new AltTetris('mb', 'e_0', 'e_1', 'e_2', 'e_3', 'msg')
+    var mb = new AltTetris('e_0', 'e_1', 'e_2', 'e_3', 'msg')
   </script>
 </body>
 </html>

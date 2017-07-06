@@ -5,7 +5,7 @@ var fnm = new Array(
 	"2048.html", 	"2048",
 	"3D2048.html", 	"3D2048",
 	"myrubix.html", "Rubix",
-     "bouncehtml",   "Bounce",
+     	"bounce.html",   "Bounce",
 	"myparser.html","My Parser" );
 
 function redisp(i)
